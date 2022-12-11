@@ -1,10 +1,13 @@
 "use strict";
 $(function () {
-    $('#searchForm').on('submit', searchCoin);
+    $("#searchForm").on("submit", searchCoin);
     function searchCoin(e) {
-        // console.log(e.target);
-        const searchData = new FormData();
-        console.log($('input').text());
-        // searchData.append("coin", $('input').contents)
+        e.preventDefault();
+        let searchParams = $("form").serializeArray();
+        $.each(searchParams, function (index, field) {
+            fetch("https://api.coingecko.com/api/v3/coins/" + field.value.toLowerCase())
+                .then((data) => console.log(data.json()))
+                .catch((error) => console.log(error));
+        });
     }
 });
