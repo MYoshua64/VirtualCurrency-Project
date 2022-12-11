@@ -32,7 +32,7 @@ $(function () {
             .css("display", "inline-block")
             .html(`<div class="card-body">
         <h5 class="card-title">
-          ${field.symbol}<span
+          ${field.symbol}<span class="ms-5"
             ><img
               src=${field.image.small}
               alt=""
