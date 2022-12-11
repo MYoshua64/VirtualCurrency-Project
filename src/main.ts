@@ -1,4 +1,5 @@
 $(function () {
+    fillCoinList();
   $("#searchForm").on("submit", searchCoin);
 
   function searchCoin(e: any): void {
@@ -12,5 +13,55 @@ $(function () {
         .then((data) => console.log(data.json()))
         .catch((error) => console.log(error));
     });
+  }
+
+  function fillCoinList(): void{
+    fetch("https://api.coingecko.com/api/v3/coins")
+    .then(function(data){
+        const dataPromise = data.json();
+        dataPromise.then(function(dataObj){
+            console.log(dataObj);
+            dataObj.forEach(function(value:any){
+                const card = createCard(value);
+                $('#coinContainer').append(card);
+            });
+        })
+        .catch((error) => console.log(error))
+    })
+    .catch((error) => console.log(error));
+  }
+
+  function createCard(field:any): JQuery<HTMLElement>{
+    const card = $("<div></div>")
+    .addClass("card w-25 p-3")
+    .css("display", "inline-block")
+    .html(
+        `<div class="card-body">
+        <h5 class="card-title">
+          ${field.symbol}<span
+            ><img
+              src=${field.image.small}
+              alt=""
+          /></span>
+        </h5>
+        <p class="card-text">${field.name}</p>
+        <a
+          class="btn btn-primary"
+          data-bs-toggle="collapse"
+          href="#${field.symbol}"
+          role="button"
+          aria-expanded="false"
+          aria-controls="collapseExample"
+        >
+          More Info
+        </a>
+        <div class="collapse" id="${field.symbol}">
+          <div class="card card-body">
+            This is a coin
+          </div>
+        </div>
+      </div>`
+    )
+    return card;
   }
 });
