@@ -2,6 +2,8 @@
 $(function () {
     fillCoinList();
     $("#searchForm").on("submit", searchCoin);
+    $("#my-modal").modal('hide');
+    let chosenCoins = [];
     function searchCoin(e) {
         e.preventDefault();
         let searchParams = $("form").serializeArray();
@@ -27,6 +29,11 @@ $(function () {
               src=${field.image.small}
               alt=""
           /></span>
+          <span>
+            <div class="form-check form-switch">
+              <input class="form-check-input coin-toggle" type="checkbox" role="switch" id="${field.id}-toggle">
+            </div>
+          </span>
         </h5>
         <p class="card-text">${field.name}</p>
         <a
@@ -52,17 +59,19 @@ $(function () {
         dataPromise.then(function (dataObj) {
             dataObj.forEach(function (value) {
                 const card = createCard(value);
-                $(`#${value.id}-desc`).text(getCoinDescription(value.id));
+                // $(`#${value.id}-desc`).html(getCoinDescription(value.id));
                 $("#coinContainer").append(card);
+            });
+            $(".coin-toggle").one("click", function () {
+                handleToggleOn($(this));
             });
         });
     }
     function getCoinDescription(coinID) {
-        fetch("https://api.coingecko.com/api/v3/coins/" + coinID)
-            .then((data) => {
+        fetch("https://api.coingecko.com/api/v3/coins/" + coinID).then((data) => {
             const dataPromise = data.json();
-            dataPromise.then((dataObj) => {
-                console.log(coinID);
+            dataPromise
+                .then((dataObj) => {
                 return dataObj.description.en;
             })
                 .catch((error) => {
@@ -70,5 +79,33 @@ $(function () {
             });
         });
         return `Coin with id of ${coinID} did not return a value!`;
+    }
+    function handleToggleOn(element) {
+        if (chosenCoins.length == 5) {
+            //pop out the modal
+            jQuery.noConflict();
+            $("#coinModal").show();
+        }
+        else {
+            const coinID = element.attr("id");
+            if (coinID != undefined) {
+                chosenCoins.push(coinID);
+                element.one("click", function () {
+                    handleToggleOff(element);
+                });
+                console.log(chosenCoins);
+            }
+        }
+    }
+    function handleToggleOff(element) {
+        const coinID = element.attr("id");
+        if (coinID != undefined) {
+            const coinIndex = chosenCoins.indexOf(coinID);
+            chosenCoins.splice(coinIndex, 1);
+            element.one("click", function () {
+                handleToggleOn(element);
+            });
+            console.log(chosenCoins);
+        }
     }
 });
