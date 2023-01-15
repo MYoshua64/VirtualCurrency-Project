@@ -35,7 +35,13 @@ $(function () {
             </div>
           </span>
         </h5>
-        <p class="card-text">${field.name}</p>
+        <p class="card-text">
+        ${field.name}<span>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="${field.id}-toggle">
+          </div>
+        </span>
+        </p>
         <a
           class="btn btn-primary"
           data-bs-toggle="collapse"
@@ -72,6 +78,7 @@ $(function () {
             const dataPromise = data.json();
             dataPromise
                 .then((dataObj) => {
+                console.log(coinID);
                 return dataObj.description.en;
             })
                 .catch((error) => {
