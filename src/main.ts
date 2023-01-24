@@ -1,8 +1,8 @@
 $(function () {
   fillCoinList();
   $("#searchForm").on("submit", searchCoin);
-  $("#my-modal").modal('hide');
   let chosenCoins: string[] = [];
+  let allCoins: Coin[] = [];
 
   function searchCoin(e: any): void {
     e.preventDefault();
@@ -42,11 +42,7 @@ $(function () {
           </span>
         </h5>
         <p class="card-text">
-        ${field.name}<span>
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="${field.id}-toggle">
-          </div>
-        </span>
+        ${field.name}
         </p>
         <a
           class="btn btn-primary"
@@ -73,7 +69,15 @@ $(function () {
     dataPromise.then(function (dataObj) {
       dataObj.forEach(function (value: any) {
         const card = createCard(value);
-        // $(`#${value.id}-desc`).html(getCoinDescription(value.id));
+
+        const coin = new Coin(
+          value.id,
+          value.name,
+          value.symbol,
+          value.image.thumb
+        );
+        allCoins.push(coin);
+
         $("#coinContainer").append(card);
       });
       $(".coin-toggle").one("click", function () {
@@ -99,8 +103,10 @@ $(function () {
   function handleToggleOn(element: JQuery<HTMLElement>) {
     if (chosenCoins.length == 5) {
       //pop out the modal
-      jQuery.noConflict();
-      $("#coinModal").show();
+      showModal();
+      element.prop("checked", false).one("click", function () {
+        handleToggleOn(element);
+      });
     } else {
       const coinID = element.attr("id");
 
@@ -111,6 +117,30 @@ $(function () {
         });
         console.log(chosenCoins);
       }
+    }
+  }
+
+  function showModal() {
+    $(".modal-body").html(``);
+    console.log(chosenCoins);
+    $.each(chosenCoins, function (index, coin) {
+      const coinName = coin.slice(0, -7);
+      const displayCoin = allCoins.find((c) => {
+        return c["id"] === coinName;
+      });
+      $(".modal-body").append(createCoinDisplay(displayCoin));
+    });
+    $("#coinModal").modal("toggle");
+
+    function createCoinDisplay(coin: Coin): string {
+      return `
+      <div class="card" style="width: 80%;">
+        <img src="${coin.imgURL}" alt="...">
+          <div class="card-body">
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          </div>
+      </div>
+      `;
     }
   }
 
