@@ -1,6 +1,9 @@
 $(function () {
   fillCoinList();
   $("#searchForm").on("submit", searchCoin);
+  $("#save-btn").on("click", function () {
+    $("#coinModal").modal("toggle");
+  });
   let chosenCoins: string[] = [];
   let allCoins: Coin[] = [];
 
@@ -100,7 +103,10 @@ $(function () {
     });
     return `Coin with id of ${coinID} did not return a value!`;
   }
-  function handleToggleOn(element: JQuery<HTMLElement>) {
+  function handleToggleOn(
+    element: JQuery<HTMLElement>,
+    shouldShorten: boolean = false
+  ) {
     if (chosenCoins.length == 5) {
       //pop out the modal
       showModal();
@@ -108,12 +114,16 @@ $(function () {
         handleToggleOn(element);
       });
     } else {
-      const coinID = element.attr("id");
+      let coinID = element.attr("id");
 
       if (coinID != undefined) {
+        if (shouldShorten) {
+          coinID = coinID.slice(0, -7);
+        }
         chosenCoins.push(coinID);
+        $(`#${coinID}`).prop("checked", true);
         element.one("click", function () {
-          handleToggleOff(element);
+          handleToggleOff(element, shouldShorten);
         });
         console.log(chosenCoins);
       }
@@ -132,9 +142,11 @@ $(function () {
         $(".modal-body").append(createCoinDisplay(displayCoin));
       }
     });
-    $(".coin-toggle-chosen").prop("checked", true).one("click", function(){
-      handleToggleOff($(this), true);
-    });
+    $(".coin-toggle-chosen")
+      .prop("checked", true)
+      .one("click", function () {
+        handleToggleOff($(this), true);
+      });
     $("#coinModal").modal("toggle");
 
     function createCoinDisplay(coin: Coin): JQuery<HTMLElement> {
@@ -156,18 +168,22 @@ $(function () {
     }
   }
 
-  function handleToggleOff(element: JQuery<HTMLElement>, shouldShorten = false) {
+  function handleToggleOff(
+    element: JQuery<HTMLElement>,
+    shouldShorten: boolean = false
+  ) {
     let coinID = element.attr("id");
 
     if (coinID != undefined) {
-      if (shouldShorten){
+      if (shouldShorten) {
         coinID = coinID.slice(0, -7);
         console.log(coinID);
       }
       const coinIndex = chosenCoins.indexOf(coinID);
       chosenCoins.splice(coinIndex, 1);
+      $(`#${coinID}`).prop("checked", false);
       element.one("click", function () {
-        handleToggleOn(element);
+        handleToggleOn(element, shouldShorten);
       });
       console.log(chosenCoins);
     }

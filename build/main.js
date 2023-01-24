@@ -2,6 +2,9 @@
 $(function () {
     fillCoinList();
     $("#searchForm").on("submit", searchCoin);
+    $("#save-btn").on("click", function () {
+        $("#coinModal").modal("toggle");
+    });
     let chosenCoins = [];
     let allCoins = [];
     function searchCoin(e) {
@@ -84,7 +87,7 @@ $(function () {
         });
         return `Coin with id of ${coinID} did not return a value!`;
     }
-    function handleToggleOn(element) {
+    function handleToggleOn(element, shouldShorten = false) {
         if (chosenCoins.length == 5) {
             //pop out the modal
             showModal();
@@ -93,11 +96,15 @@ $(function () {
             });
         }
         else {
-            const coinID = element.attr("id");
+            let coinID = element.attr("id");
             if (coinID != undefined) {
+                if (shouldShorten) {
+                    coinID = coinID.slice(0, -7);
+                }
                 chosenCoins.push(coinID);
+                $(`#${coinID}`).prop("checked", true);
                 element.one("click", function () {
-                    handleToggleOff(element);
+                    handleToggleOff(element, shouldShorten);
                 });
                 console.log(chosenCoins);
             }
@@ -115,7 +122,9 @@ $(function () {
                 $(".modal-body").append(createCoinDisplay(displayCoin));
             }
         });
-        $(".coin-toggle-chosen").prop("checked", true).one("click", function () {
+        $(".coin-toggle-chosen")
+            .prop("checked", true)
+            .one("click", function () {
             handleToggleOff($(this), true);
         });
         $("#coinModal").modal("toggle");
@@ -146,8 +155,9 @@ $(function () {
             }
             const coinIndex = chosenCoins.indexOf(coinID);
             chosenCoins.splice(coinIndex, 1);
+            $(`#${coinID}`).prop("checked", false);
             element.one("click", function () {
-                handleToggleOn(element);
+                handleToggleOn(element, shouldShorten);
             });
             console.log(chosenCoins);
         }
