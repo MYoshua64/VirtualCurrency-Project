@@ -128,26 +128,42 @@ $(function () {
       const displayCoin = allCoins.find((c) => {
         return c["id"] === coinName;
       });
-      $(".modal-body").append(createCoinDisplay(displayCoin));
+      if (displayCoin != undefined) {
+        $(".modal-body").append(createCoinDisplay(displayCoin));
+      }
+    });
+    $(".coin-toggle-chosen").prop("checked", true).one("click", function(){
+      handleToggleOff($(this), true);
     });
     $("#coinModal").modal("toggle");
 
-    function createCoinDisplay(coin: Coin): string {
-      return `
-      <div class="card" style="width: 80%;">
+    function createCoinDisplay(coin: Coin): JQuery<HTMLElement> {
+      const card = $("<div></div>")
+        .addClass("card w-50 p-3")
+        .css("display", "inline-block").html(`
         <img src="${coin.imgURL}" alt="...">
-          <div class="card-body">
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-          </div>
-      </div>
-      `;
+        <div class="card-body">
+          <p class="card-text">${coin.name}
+            <span>
+              <div class="form-check form-switch">
+               <input class="form-check-input coin-toggle-chosen" type="checkbox" role="switch" id="${coin.id}-toggle-chosen">
+              </div>
+            </span>
+          </p>
+        </div>
+      `);
+      return card;
     }
   }
 
-  function handleToggleOff(element: JQuery<HTMLElement>) {
-    const coinID = element.attr("id");
+  function handleToggleOff(element: JQuery<HTMLElement>, shouldShorten = false) {
+    let coinID = element.attr("id");
 
     if (coinID != undefined) {
+      if (shouldShorten){
+        coinID = coinID.slice(0, -7);
+        console.log(coinID);
+      }
       const coinIndex = chosenCoins.indexOf(coinID);
       chosenCoins.splice(coinIndex, 1);
       element.one("click", function () {
