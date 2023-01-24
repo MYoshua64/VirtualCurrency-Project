@@ -59,7 +59,9 @@ $(function () {
         </a>
         <div class="collapse" id="${field.symbol}">
           <div class="card card-body" id="${field.id}-desc">
-            This is a coin
+            <p>USD Price: ${field.market_data.current_price.usd}$</p>
+            <p>EUR Price: ${field.market_data.current_price.eur}&#8364;</p>
+            <p>ILS Price: ${field.market_data.current_price.ils}&#8362;</p>
           </div>
         </div>
       </div>`
@@ -77,12 +79,16 @@ $(function () {
           value.id,
           value.name,
           value.symbol,
-          value.image.thumb
+          value.image.thumb,
+          value.market_data.current_price.usd,
+          value.market_data.current_price.eur,
+          value.market_data.current_price.ils
         );
         allCoins.push(coin);
-
+        
         $("#coinContainer").append(card);
       });
+      console.log(allCoins);
       $(".coin-toggle").one("click", function () {
         handleToggleOn($(this));
       });
