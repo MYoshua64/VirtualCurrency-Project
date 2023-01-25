@@ -12,12 +12,19 @@ $(function () {
     let searchParams = $("form").serializeArray();
 
     $.each(searchParams, function (index, field) {
-      fetch(
-        "https://api.coingecko.com/api/v3/coins/" + field.value.toLowerCase()
-      )
-        .then((data) => console.log(data.json()))
-        .catch((error) => console.log(error));
+      const selected = allCoins.find((c) => {
+        return c["id"] === field.value.toLocaleLowerCase();
+      });
+      if (selected != undefined) {
+        displaySingularCoin(selected);
+      }
     });
+
+    function displaySingularCoin(selected: Coin) {
+      const coinCard = $(`#${selected.id}-card`);
+      console.log(coinCard);
+      $('#coinContainer').html(``).append(coinCard);
+    }
   }
 
   function fillCoinList(): void {
@@ -28,6 +35,7 @@ $(function () {
 
   function createCard(field: any): JQuery<HTMLElement> {
     const card = $("<div></div>")
+      .attr('id', `${field.id}-card`)
       .addClass("card w-25 p-3")
       .css("display", "inline-block")
       .html(
@@ -72,6 +80,8 @@ $(function () {
   function resolveCoinListAPI(data: Response) {
     const dataPromise = data.json();
     dataPromise.then(function (dataObj) {
+      $("#coinContainer").html(``);
+      console.log(dataObj);
       dataObj.forEach(function (value: any) {
         const card = createCard(value);
 
@@ -85,7 +95,7 @@ $(function () {
           value.market_data.current_price.ils
         );
         allCoins.push(coin);
-        
+
         $("#coinContainer").append(card);
       });
       console.log(allCoins);
