@@ -168,11 +168,20 @@ $(function () {
                 console.log(coinID);
             }
             const coinIndex = chosenCoins.indexOf(coinID);
-            chosenCoins.splice(coinIndex, 1);
-            $(`#${coinID}`).prop("checked", false);
-            element.one("click", function () {
-                handleToggleOn(element, shouldShorten);
-            });
+            console.log(coinIndex);
+            if (coinIndex >= 0) {
+                chosenCoins.splice(coinIndex, 1);
+            }
+            if (shouldShorten) {
+                element.prop("checked", false).one("click", function () {
+                    handleToggleOn(element, shouldShorten);
+                });
+            }
+            else {
+                $(`#${coinID}`).prop("checked", false).one("click", function () {
+                    handleToggleOn(element, shouldShorten);
+                });
+            }
             console.log(chosenCoins);
         }
     }
